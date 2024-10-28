@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Cart</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <section class="text-gray-600 body-font overflow-hidden">
+    <div class="container px-5 py-24 mx-auto">
+      <h1 class="text-3xl mb-4">Your Cart</h1>
+      <div id="cartItems" class="flex flex-col space-y-4"></div>
+      <h2 class="text-2xl mt-4">Total: <span id="totalPrice">0</span> Rs.</h2>
+    </div>
+  </section>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      renderCart();
+    });
+
+    function renderCart() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const cartItemsDiv = document.getElementById('cartItems');
+      cartItemsDiv.innerHTML = '';
+      let totalPrice = 0;
+
+      cart.forEach((item, index) => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'flex items-center justify-between mb-4';
+
+        // Image
+        const image = document.createElement('img');
+        image.src = item.image || '';  // Ensure a fallback if `image` is undefined
+        image.alt = item.name;
+        image.className = 'w-20 h-20 object-cover rounded';
+
+        // Name and Quantity
+        const name = document.createElement('span');
+        name.className = 'flex-1 ml-4';
+        name.textContent = `${item.name} x${item.quantity}`;
+
+        // Price
+        const price = document.createElement('span');
+        price.textContent = `${(item.price * item.quantity).toFixed(2)} Rs.`;
+
+        // Delete Button
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Remove';
+        deleteButton.className = 'text-red-500 ml-4';
+        deleteButton.onclick = () => removeFromCart(index);
+
+        itemDiv.appendChild(image);
+        itemDiv.appendChild(name);
+        itemDiv.appendChild(price);
+        itemDiv.appendChild(deleteButton);
+
+        cartItemsDiv.appendChild(itemDiv);
+        totalPrice += item.price * item.quantity;
+      });
+
+      document.getElementById('totalPrice').innerText = totalPrice.toFixed(2);
+    }
+
+    function removeFromCart(index) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      cart.splice(index, 1);  // Remove item by index
+      localStorage.setItem('cart', JSON.stringify(cart));
+      renderCart();
+    }
+  </script>
+</body>
+</html>
